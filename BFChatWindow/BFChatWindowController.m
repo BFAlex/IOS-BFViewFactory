@@ -69,16 +69,16 @@
 
 - (NSMutableArray *)testRecordArr {
     
-    NSDictionary *dict1 = [NSDictionary dictionaryWithObjectsAndKeys:@"weixin", @"name", @"微信团队欢迎你。很高兴你开启了微信生活，期待能为你和朋友们带来愉快的沟通体检", @"content", nil];
-    NSDictionary *dict2 = [NSDictionary dictionaryWithObjectsAndKeys:@"rb", @"name", @"a", @"content", nil];
-    NSDictionary *dict3 = [NSDictionary dictionaryWithObjectsAndKeys:@"rb", @"name", @"bb", @"content", nil];
-    NSDictionary *dict4 = [NSDictionary dictionaryWithObjectsAndKeys:@"weixin", @"name", @"ccc", @"content", nil];
-    NSDictionary *dict5 = [NSDictionary dictionaryWithObjectsAndKeys:@"rb", @"name", @"dddd", @"content", nil];
-    NSDictionary *dict6 = [NSDictionary dictionaryWithObjectsAndKeys:@"weixin", @"name", @"eeeee", @"content", nil];
-    NSDictionary *dict7 = [NSDictionary dictionaryWithObjectsAndKeys:@"rb", @"name", @"abcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcde", @"content", nil];
-    NSDictionary *dict9 = [NSDictionary dictionaryWithObjectsAndKeys:@"rb", @"name", @"0", @"content", nil];
-    NSDictionary *dict10 = [NSDictionary dictionaryWithObjectsAndKeys:@"weixin", @"name", @"0", @"content", nil];
-//    NSDictionary *dict8 = [NSDictionary dictionaryWithObjectsAndKeys:@"weixin", @"name", @"", @"content", nil];
+    NSDictionary *dict1 = [NSDictionary dictionaryWithObjectsAndKeys:@"weixin", @"Name", @"0", @"InfoType", @"微信团队欢迎你。很高兴你开启了微信生活，期待能为你和朋友们带来愉快的沟通体检", @"Content", nil];
+    NSDictionary *dict2 = [NSDictionary dictionaryWithObjectsAndKeys:@"rb", @"Name", @"0", @"InfoType", @"a", @"Content", nil];
+    NSDictionary *dict3 = [NSDictionary dictionaryWithObjectsAndKeys:@"rb", @"Name", @"0", @"InfoType", @"bb", @"Content", nil];
+    NSDictionary *dict4 = [NSDictionary dictionaryWithObjectsAndKeys:@"weixin", @"Name", @"0", @"InfoType", @"ccc", @"Content", nil];
+    NSDictionary *dict5 = [NSDictionary dictionaryWithObjectsAndKeys:@"rb", @"Name", @"0", @"InfoType", @"dddd", @"Content", nil];
+    NSDictionary *dict6 = [NSDictionary dictionaryWithObjectsAndKeys:@"weixin", @"Name", @"0", @"InfoType", @"eeeee", @"Content", nil];
+    NSDictionary *dict7 = [NSDictionary dictionaryWithObjectsAndKeys:@"rb", @"Name", @"0", @"InfoType", @"abcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcde", @"Content", nil];
+    NSDictionary *dict9 = [NSDictionary dictionaryWithObjectsAndKeys:@"rb", @"Name", @"1", @"InfoType", @"0", @"Content", nil];
+    NSDictionary *dict10 = [NSDictionary dictionaryWithObjectsAndKeys:@"weixin", @"Name", @"1", @"InfoType", @"0", @"Content", nil];
+//    NSDictionary *dict8 = [NSDictionary dictionaryWithObjectsAndKeys:@"weixin", @"Name", @"", @"Content", nil];
     
     NSMutableArray *rArr = [[NSMutableArray alloc] initWithObjects:dict1, dict9, dict10, dict2, dict3, dict4, dict5, dict6, dict7, nil];
     
@@ -138,7 +138,7 @@
     
     CGSize windowSize = self.view.frame.size;
     
-    CGSize size = [[dict objectForKey:@"content"] sizeWithFont:font constrainedToSize:CGSizeMake(windowSize.width/2, windowSize.height*5) lineBreakMode:NSLineBreakByWordWrapping];
+    CGSize size = [[dict objectForKey:@"Content"] sizeWithFont:font constrainedToSize:CGSizeMake(windowSize.width/2, windowSize.height*5) lineBreakMode:NSLineBreakByWordWrapping];
     
     CGFloat cellH = size.height + kMargin * 4 >= kHeadImgWH ? size.height + kMargin * 4 : kHeadImgWH;
     
@@ -181,63 +181,82 @@
         }
     }
     
-    NSDictionary *dict = _recordArr[indexPath.row];
     
     CGRect windowFrame = self.view.frame;
-    // 头像
-    UIImageView *headImg;
-    if ([[dict objectForKey:@"name"] isEqualToString:@"rb"]) {
+    
+    // cell headImg
+    UIImageView *headImage;
+    BOOL selfInfo;
+    if ([[_recordArr[indexPath.row] objectForKey:@"Name"] isEqualToString:@"rb"]) {
         
-        headImg = [[UIImageView alloc] initWithFrame:CGRectMake(windowFrame.size.width - kMargin - kHeadImgWH, kMargin, kHeadImgWH, kHeadImgWH)];
+        headImage = [[UIImageView alloc] initWithFrame:CGRectMake(windowFrame.size.width - kMargin - kHeadImgWH, kMargin, kHeadImgWH, kHeadImgWH)];
         
-        [cell addSubview:headImg];
+        headImage.image = [UIImage imageNamed:@"item.png"];
         
-        headImg.image = [UIImage imageNamed:@"item.png"];
-        
-        if ([[dict objectForKey:@"content"] isEqualToString:@"0"]) {
-            
-            [cell addSubview:[self voiceView:10 from:YES withIndexRow:indexPath.row withPosition:kHeadImgWH + kMargin*2]];
-            
-        } else {
-            
-            [cell addSubview:[self bubbleView:[dict objectForKey:@"content"] from:YES withPosition:kHeadImgWH + kMargin*2]];
-        }
+        selfInfo = YES;
         
     } else {
         
-        headImg = [[UIImageView alloc] initWithFrame:CGRectMake(kMargin, kMargin, kHeadImgWH, kHeadImgWH)];
+        headImage = [[UIImageView alloc] initWithFrame:CGRectMake(kMargin, kMargin, kHeadImgWH, kHeadImgWH)];
         
-        [cell addSubview:headImg];
+        headImage.image = [UIImage imageNamed:@"item.png"];
         
-        headImg.image = [UIImage imageNamed:@"item.png"];
-        
-        if ([[dict objectForKey:@"content"] isEqualToString:@"0"]) {
-            
-            UIView *voiceView = [self voiceView:90 from:NO withIndexRow:indexPath.row withPosition:kHeadImgWH + kMargin*2];
-            [cell addSubview:voiceView];
-            
-            // 未读语音标识 (注释为判断条件，待用)
-//            BOOL read = [_recordArr[indexPath.row] objectForKey:@"ReadTag"];
-//            if (!read) {
-            
-                UIView *readTag = [[UIView alloc] initWithFrame:CGRectMake(voiceView.frame.origin.x + voiceView.bounds.size.width + kMargin, voiceView.frame.origin.y, 10.0f, 10.0f)];
-            
-                readTag.layer.masksToBounds = YES;
-                readTag.layer.cornerRadius = readTag.bounds.size.width/2;
-                readTag.layer.backgroundColor = [[UIColor redColor] CGColor];
-                
-                [cell addSubview:readTag];
-//            }
-            
-        } else {
-            
-            [cell addSubview:[self bubbleView:[dict objectForKey:@"content"] from:NO withPosition:kHeadImgWH + kMargin*2]];
-        }
+        selfInfo = NO;
     }
     
-    headImg.layer.masksToBounds = YES;
-    headImg.layer.cornerRadius = headImg.bounds.size.width/2;
-    headImg.layer.borderWidth = 1.0f;
+    headImage.layer.masksToBounds = YES;
+    headImage.layer.cornerRadius = headImage.bounds.size.width/2;
+    headImage.layer.borderWidth = 1.0f;
+    
+    [cell addSubview:headImage];
+    
+    
+    // cell content
+    switch ([[_recordArr[indexPath.row] objectForKey:@"InfoType"] intValue]) {
+            
+        case 0: // text
+            
+            [cell addSubview:[self bubbleViewAtIndexPath:indexPath from:selfInfo withXPositiom:kHeadImgWH + kMargin*2]];
+            
+            break;
+            
+        case 1: // voice
+            
+            [cell addSubview:[self voiceViewAtIndexPath:indexPath from:selfInfo withXPositiom:kHeadImgWH + kMargin*2]];
+            
+            if (!selfInfo) {
+                
+                // 未读语音标识 (注释为判断条件，待用)
+                BOOL unread = [_recordArr[indexPath.row] objectForKey:@"ReadTag"];
+                
+                if (unread) {
+                    
+                    UIView *voiceView = [cell.subviews lastObject];
+                    
+                    UIView *readTag = [[UIView alloc] initWithFrame:CGRectMake(voiceView.frame.origin.x + voiceView.bounds.size.width + kMargin, voiceView.frame.origin.y, 10.0f, 10.0f)];
+                    
+                    readTag.layer.masksToBounds = YES;
+                    readTag.layer.cornerRadius = readTag.bounds.size.width/2;
+                    readTag.layer.backgroundColor = [[UIColor redColor] CGColor];
+                    
+                    [cell addSubview:readTag];
+                }
+            }
+            
+            break;
+           
+        case 2: // image
+            
+            break;
+            
+        case 3: // date time
+            
+            break;
+            
+        default:
+            break;
+    }
+    
     
     return cell;
 }
@@ -340,25 +359,25 @@
 
 
 #pragma mark - copy code
-// 泡泡文本
-- (UIView *)bubbleView:(NSString *)text from:(BOOL)fromSelf withPosition:(int)position {
+// 泡泡文本(重构版)
+- (UIView *)bubbleViewAtIndexPath:(NSIndexPath *)indexPath from:(BOOL)selfInfo withXPositiom:(int)position {
+    
+    NSString *text = [_recordArr[indexPath.row] objectForKey:@"Content"];
     
     CGSize windowSize = self.view.frame.size;
-    
     // 计算大小
     UIFont *font = [UIFont systemFontOfSize:kFontSize];
     CGSize size = [text sizeWithFont:font constrainedToSize:CGSizeMake(windowSize.width/2, windowSize.height*5) lineBreakMode:NSLineBreakByWordWrapping];
     
-    // build single chat bubble cell with given text
-    UIView *returnView = [[UIView alloc] initWithFrame:CGRectZero];
-    returnView.backgroundColor = [UIColor clearColor];
+    UIView *cellView = [[UIView alloc] initWithFrame:CGRectZero];
+    cellView.backgroundColor = [UIColor clearColor];
     
-    // 背景图片
-    UIImage *bubble = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle] pathForResource:fromSelf ? @"SendAppNodeBg_HL" : @"ReceiverTextNodeBg" ofType:@"png"]];
-    UIImageView *bubbleImgView = [[UIImageView alloc] initWithImage:[bubble stretchableImageWithLeftCapWidth:bubble.size.width/2 topCapHeight:floorf(bubble.size.height*0.9)]];
+    // cell background image
+    UIImage *bubbleImg = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle] pathForResource:selfInfo ? @"SendAppNodeBg_HL" : @"ReceiverTextNodeBg" ofType:@"png"]];
+    UIImageView *bubbleImgView = [[UIImageView alloc] initWithImage:[bubbleImg stretchableImageWithLeftCapWidth:bubbleImg.size.width/2 topCapHeight:floorf(bubbleImg.size.height*0.9)]];
     
-    // 添加文本信息
-    UILabel *bubbleText = [[UILabel alloc] initWithFrame:CGRectMake(fromSelf ? kMargin * 2 : kMargin * 2 + 10.0f, kMargin*2, size.width, size.height)];
+    // cell text
+    UILabel *bubbleText = [[UILabel alloc] initWithFrame:CGRectMake(selfInfo ? kMargin * 2 : kMargin * 2 + 10.0f, kMargin*2, size.width, size.height)];
     bubbleText.backgroundColor = [UIColor clearColor];
     bubbleText.font = font;
     bubbleText.numberOfLines = 0;
@@ -368,39 +387,39 @@
     CGFloat bivH = bubbleText.frame.size.height + kMargin * 4 >= kHeadImgWH ? bubbleText.frame.size.height  + kMargin * 4 : kHeadImgWH;
     bubbleImgView.frame = CGRectMake(0.0f, 0.0f, bubbleText.frame.size.width + kMargin * 4 + 10.0f, bivH);
     
-    if (fromSelf) {
+    if (selfInfo) {
         
-        returnView.frame = CGRectMake(windowSize.width - position - bubbleImgView.frame.size.width, kMargin, bubbleImgView.frame.size.width, bubbleImgView.frame.size.height);
+        cellView.frame = CGRectMake(windowSize.width - position - bubbleImgView.frame.size.width, kMargin, bubbleImgView.frame.size.width, bubbleImgView.frame.size.height);
         
     } else {
         
-        returnView.frame = CGRectMake(position, kMargin, bubbleImgView.frame.size.width, bubbleImgView.frame.size.height);
+        cellView.frame = CGRectMake(position, kMargin, bubbleImgView.frame.size.width, bubbleImgView.frame.size.height);
     }
     
-    [returnView addSubview:bubbleImgView];
     
-    [returnView addSubview:bubbleText];
+    [cellView addSubview:bubbleImgView];
     
+    [cellView addSubview:bubbleText];
     
-    return returnView;
+    return cellView;
 }
 
-// 泡泡语音
-- (UIView *)voiceView:(NSInteger)longTime from:(BOOL)fromSelf withIndexRow:(NSInteger)indexRow withPosition:(int)position {
+// 泡泡语音(重构版)
+- (UIView *)voiceViewAtIndexPath:(NSIndexPath *)indexPath from:(BOOL)selfInfo withXPositiom:(int)position {
+    
+    NSInteger voiceTime = [self voiceTimeAtIndexPath:indexPath];
     
     CGSize windowSize = self.view.frame.size;
     
     // 根据语音长度
     CGFloat btnMaxW = self.view.bounds.size.width * 0.5;
-    int voiceWidth = (int)(longTime + kHeadImgWH > btnMaxW ? btnMaxW : kHeadImgWH + longTime);
+    int voiceWidth = (int)(voiceTime + kHeadImgWH > btnMaxW ? btnMaxW : kHeadImgWH + voiceTime);
     
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
-    
-    btn.tag = indexRow;
-    
+    btn.tag = indexPath.row;
     CGFloat btnWidth = voiceWidth + kMargin * 2;
     NSMutableString *preAnimation = [[NSMutableString alloc] init];
-    if (fromSelf) {
+    if (selfInfo) {
         
         btn.frame = CGRectMake(windowSize.width - position - btnWidth, kMargin, btnWidth, kHeadImgWH);
         
@@ -417,13 +436,14 @@
     UIEdgeInsets imgInsert;
     imgInsert.top = -kMargin/2;
     CGFloat leftInsert = btnWidth - kHeadImgWH - kMargin * 2;
-    imgInsert.left = fromSelf ? leftInsert : -leftInsert;
+    imgInsert.left = selfInfo ? leftInsert : -leftInsert;
     btn.imageEdgeInsets = imgInsert;
     
-    [btn setImage:[UIImage imageNamed:fromSelf ? @"SenderVoiceNodePlaying" : @"ReceiverVoiceNodePlaying"] forState:UIControlStateNormal];
-    UIImage *bgImg = [UIImage imageNamed:fromSelf ? @"SenderVoiceNodeDownloading" : @"ReceiverVoiceNodeDownloading"];
+    [btn setImage:[UIImage imageNamed:selfInfo ? @"SenderVoiceNodePlaying" : @"ReceiverVoiceNodePlaying"] forState:UIControlStateNormal];
+    UIImage *bgImg = [UIImage imageNamed:selfInfo ? @"SenderVoiceNodeDownloading" : @"ReceiverVoiceNodeDownloading"];
     bgImg = [bgImg stretchableImageWithLeftCapWidth:btn.bounds.size.width/4 topCapHeight:5];
     [btn setBackgroundImage:bgImg forState:UIControlStateNormal];
+    
     // animation imgs
     NSMutableArray *imgs = [[NSMutableArray alloc] init];
     for (int i = 1; i <= 3; i++) {
@@ -431,15 +451,15 @@
         [imgs addObject:[UIImage imageNamed:[NSString stringWithFormat:@"%@%zd.png", preAnimation, i]]];
     }
     btn.imageView.animationImages = imgs;
-    btn.imageView.animationRepeatCount = longTime;
+    btn.imageView.animationRepeatCount = voiceTime;
     btn.imageView.animationDuration = 1.0f;
     
     CGFloat labelW = kHeadImgWH*2;
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(fromSelf ? -labelW - kMargin : btn.frame.size.width + kMargin, btn.bounds.size.height - kHeadImgWH/2, labelW, kHeadImgWH/2)];
-    label.text = [self strForVoiceTime:longTime];
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(selfInfo ? -labelW - kMargin : btn.frame.size.width + kMargin, btn.bounds.size.height - kHeadImgWH/2, labelW, kHeadImgWH/2)];
+    label.text = [self strForVoiceTime:voiceTime];
     label.textColor = [UIColor grayColor];
     label.font = [UIFont systemFontOfSize:kFontSize - 5];
-    label.textAlignment = fromSelf ? NSTextAlignmentRight : NSTextAlignmentLeft;
+    label.textAlignment = selfInfo ? NSTextAlignmentRight : NSTextAlignmentLeft;
     label.backgroundColor = [UIColor clearColor];
     [btn addSubview:label];
     
@@ -449,23 +469,27 @@
     return btn;
 }
 
+- (NSInteger)voiceTimeAtIndexPath:(NSIndexPath *)indexPath {
+    
+    if (indexPath.row % 2) {
+        
+        return 10;
+        
+    } else {
+        
+        return 90;
+    }
+    
+    //    return 10;
+}
+
 - (void)playVoice:(UIButton *)btn {
     NSLog(@"%@", kLogString);
-    
-//    if ([btn.imageView isAnimating]) {
-//        
-//        [btn.imageView stopAnimating];
-//        
-//    } else {
-//        
-//        [btn.imageView startAnimating];
-//    }
     
     if (_playingVoiceBtn) {
         
         [_playingVoiceBtn.imageView stopAnimating];
         
-//        _playingVoiceBtn = nil;
     }
     
     if (btn != _playingVoiceBtn) {
@@ -498,7 +522,7 @@
 }
 
 
-
+//----------------------------------------
 // unused
 - (UIImage *)maskImage:(UIImage *)image withMask:(UIImage *)maskImg {
     

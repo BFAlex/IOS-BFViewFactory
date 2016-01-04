@@ -16,6 +16,7 @@
 #define kHeadImgWH      40
 #define kMargin         5
 #define kFontSize       20
+#define kImageWH        160
 
 
 @interface BFChatWindowController () <UITableViewDataSource, UITableViewDelegate, BFEnterViewDelegate>{
@@ -25,6 +26,8 @@
     NSMutableArray *_cellHeightArr;
     
     UIButton *_playingVoiceBtn;
+    
+    NSString *_preBubbleStr;
 }
 
 @end
@@ -50,7 +53,6 @@
     return self;
 }
 
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -63,6 +65,8 @@
 }
 
 - (void)initData {
+    
+    _preBubbleStr = @"bubble1_";
     
     _recordArr = [self testRecordArr];
 }
@@ -78,9 +82,11 @@
     NSDictionary *dict7 = [NSDictionary dictionaryWithObjectsAndKeys:@"rb", @"Name", @"0", @"InfoType", @"abcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcde", @"Content", nil];
     NSDictionary *dict9 = [NSDictionary dictionaryWithObjectsAndKeys:@"rb", @"Name", @"1", @"InfoType", @"0", @"Content", nil];
     NSDictionary *dict10 = [NSDictionary dictionaryWithObjectsAndKeys:@"weixin", @"Name", @"1", @"InfoType", @"0", @"Content", nil];
+    NSDictionary *dict11 = [NSDictionary dictionaryWithObjectsAndKeys:@"weixin", @"Name", @"2", @"InfoType", @"0", @"Content", nil];
+    NSDictionary *dict12 = [NSDictionary dictionaryWithObjectsAndKeys:@"rb", @"Name", @"2", @"InfoType", @"0", @"Content", nil];
 //    NSDictionary *dict8 = [NSDictionary dictionaryWithObjectsAndKeys:@"weixin", @"Name", @"", @"Content", nil];
     
-    NSMutableArray *rArr = [[NSMutableArray alloc] initWithObjects:dict1, dict9, dict10, dict2, dict3, dict4, dict5, dict6, dict7, nil];
+    NSMutableArray *rArr = [[NSMutableArray alloc] initWithObjects:dict1, dict9, dict10, dict11, dict12, dict2, dict3, dict4, dict5, dict6, dict7, nil];
     
     return rArr;
 }
@@ -127,41 +133,41 @@
 #pragma mark - DataSource
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     
+    if (!tableView.backgroundView) {
+        
+        UIImageView *tabelBG = [[UIImageView alloc] initWithFrame:tableView.bounds];
+        
+        tabelBG.image = [UIImage imageNamed:@"qo.jpg"];
+        
+        tableView.backgroundView = tabelBG;
+    }
+    
     return _recordArr.count;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    NSDictionary *dict = _recordArr[indexPath.row];
+    CGFloat cellH;
     
-    UIFont *font = [UIFont systemFontOfSize:kFontSize];
+    if ([[_recordArr[indexPath.row] objectForKey:@"InfoType"] intValue] == 2) {
+        
+        cellH = kImageWH;
+        
+    } else {
+        
+        NSDictionary *dict = _recordArr[indexPath.row];
+        
+        UIFont *font = [UIFont systemFontOfSize:kFontSize];
+        
+        CGSize windowSize = self.view.frame.size;
+        
+        CGSize size = [[dict objectForKey:@"Content"] sizeWithFont:font constrainedToSize:CGSizeMake(windowSize.width/2, windowSize.height*5) lineBreakMode:NSLineBreakByWordWrapping];
+        
+        cellH = size.height + kMargin * 4 >= kHeadImgWH ? size.height + kMargin * 4 : kHeadImgWH;
+    }
     
-    CGSize windowSize = self.view.frame.size;
-    
-    CGSize size = [[dict objectForKey:@"Content"] sizeWithFont:font constrainedToSize:CGSizeMake(windowSize.width/2, windowSize.height*5) lineBreakMode:NSLineBreakByWordWrapping];
-    
-    CGFloat cellH = size.height + kMargin * 4 >= kHeadImgWH ? size.height + kMargin * 4 : kHeadImgWH;
     
     return cellH + kMargin * 2;
-}
-
-
-- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    NSLog(@"%@", kLogString);
-    
-    UIView *headView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 25)];
-    headView.clipsToBounds = YES;
-    
-    UIActivityIndicatorView *actIndicator = [[ UIActivityIndicatorView alloc] init];
-    actIndicator.center = headView.center;
-    actIndicator.center = headView.center;
-    actIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
-    actIndicator.hidden = NO;
-    [actIndicator startAnimating];
-    
-    [headView addSubview:actIndicator];
-    
-    return headView;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -229,7 +235,7 @@
                 // 未读语音标识 (注释为判断条件，待用)
                 BOOL unread = [_recordArr[indexPath.row] objectForKey:@"ReadTag"];
                 
-                if (unread) {
+                if (!unread) {
                     
                     UIView *voiceView = [cell.subviews lastObject];
                     
@@ -246,6 +252,7 @@
             break;
            
         case 2: // image
+            [cell addSubview:[self imageViewAtIndexPath:indexPath from:selfInfo withXPositiom:kHeadImgWH + kMargin*2]];
             
             break;
             
@@ -257,7 +264,7 @@
             break;
     }
     
-    
+    cell.backgroundColor = [UIColor clearColor];
     return cell;
 }
 
@@ -373,7 +380,7 @@
     cellView.backgroundColor = [UIColor clearColor];
     
     // cell background image
-    UIImage *bubbleImg = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle] pathForResource:selfInfo ? @"SendAppNodeBg_HL" : @"ReceiverTextNodeBg" ofType:@"png"]];
+    UIImage *bubbleImg = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle] pathForResource:selfInfo ? [NSString stringWithFormat:@"%@SendVIT", _preBubbleStr] : [NSString stringWithFormat:@"%@ReceiveT", _preBubbleStr] ofType:@"png"]];
     UIImageView *bubbleImgView = [[UIImageView alloc] initWithImage:[bubbleImg stretchableImageWithLeftCapWidth:bubbleImg.size.width/2 topCapHeight:floorf(bubbleImg.size.height*0.9)]];
     
     // cell text
@@ -440,7 +447,7 @@
     btn.imageEdgeInsets = imgInsert;
     
     [btn setImage:[UIImage imageNamed:selfInfo ? @"SenderVoiceNodePlaying" : @"ReceiverVoiceNodePlaying"] forState:UIControlStateNormal];
-    UIImage *bgImg = [UIImage imageNamed:selfInfo ? @"SenderVoiceNodeDownloading" : @"ReceiverVoiceNodeDownloading"];
+    UIImage *bgImg = [UIImage imageNamed:selfInfo ? [NSString stringWithFormat:@"%@SendVIT", _preBubbleStr] : [NSString stringWithFormat:@"%@ReceiveVI", _preBubbleStr]];
     bgImg = [bgImg stretchableImageWithLeftCapWidth:btn.bounds.size.width/4 topCapHeight:5];
     [btn setBackgroundImage:bgImg forState:UIControlStateNormal];
     
@@ -521,40 +528,45 @@
     return timeStr;
 }
 
-
-//----------------------------------------
-// unused
-- (UIImage *)maskImage:(UIImage *)image withMask:(UIImage *)maskImg {
+// 泡泡图片
+- (UIView *)imageViewAtIndexPath:(NSIndexPath *)indexPath from:(BOOL)selfInfo withXPositiom:(int)position {
     
-    CGImageRef maskRef = [maskImg CGImage];
+    CGSize windowSize = self.view.frame.size;
     
-    CGImageRef mask = CGImageMaskCreate(CGImageGetWidth(maskRef),
-                                        CGImageGetHeight(maskRef),
-                                        CGImageGetBitsPerComponent(maskRef),
-                                        CGImageGetBitsPerPixel(maskRef),
-                                        CGImageGetBytesPerRow(maskRef),
-                                        CGImageGetDataProvider(maskRef), NULL, true);
+    UIImageView *imageView = [[UIImageView alloc] init];
     
-    CGImageRef masked = CGImageCreateWithMask([image CGImage], mask);
-//    CGImageRef masked = CGImageCreateWithMask(maskRef, mask);
+    CALayer *mask = [CALayer layer];
     
-  
-    return [UIImage imageWithCGImage:masked];
-}
-
-- (UIImage *)overlapImages:(UIImage *)topImg andBottomImg:(UIImage *)bottomImg {
+    if (selfInfo) {
+        
+        imageView.frame = CGRectMake(windowSize.width - position - kImageWH, kMargin, kImageWH, kImageWH);
+        
+        mask.contents = (id)[[UIImage imageNamed:[NSString stringWithFormat:@"%@SendVIT", _preBubbleStr]] CGImage];
+        
+    } else {
+        
+        imageView.frame = CGRectMake(position, kMargin, kImageWH, kImageWH);
+        
+        mask.contents = (id)[[UIImage imageNamed:[NSString stringWithFormat:@"%@ReceiveT", _preBubbleStr]] CGImage];
+    }
     
-    UIGraphicsBeginImageContext(bottomImg.size);
+    mask.frame = imageView.bounds;
+    if (selfInfo) {
+        
+        mask.contentsCenter = CGRectMake(0.1, 0.9, 0, 0);
+        
+    } else {
+        
+        mask.contentsCenter = CGRectMake(0.9, 0.9, 0, 0);
+    }
     
-    [bottomImg drawInRect:CGRectMake(0, 0, bottomImg.size.width, bottomImg.size.height)];
+    imageView.layer.mask = mask;
+    imageView.layer.masksToBounds = YES;
     
-    [topImg drawInRect:CGRectMake(0, 0, bottomImg.size.width, bottomImg.size.height)];
+    // 从字典中获取图片img
+    imageView.image = [UIImage imageNamed:@"palette_bg"];
     
-    UIImage *curImg = UIGraphicsGetImageFromCurrentImageContext();
-    
-    UIGraphicsEndImageContext();
-    
-    return curImg;
+    return imageView;
 }
 
 @end
